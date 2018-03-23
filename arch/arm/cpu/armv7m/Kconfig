@@ -1,0 +1,8 @@
+menu "sysTick Timer Support"
+
+config SYS_ARCH_TIMER
+        bool "STM32F7 timer support"
+	help
+	  Select this to enable support for the systick timer found on STM32 devices.
+
+endmenu

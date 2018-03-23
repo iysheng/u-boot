@@ -32,7 +32,11 @@ __usage_fault_entry:
 .type __invalid_entry, %function
 __invalid_entry:
 	mov	r0, sp	@ pass auto-saved registers as argument
-	b	do_invalid_entry
+    b	do_invalid_entry
+
+.type __systick_entry, %function
+__systick_entry:
+    b   do_systick_entry
 
    .section  .vectors
 ENTRY(_start)
@@ -51,7 +55,7 @@ ENTRY(_start)
 	.long	__invalid_entry			@ 12 - Debug Monitor
 	.long	__invalid_entry			@ 13 - Reserved
 	.long	__invalid_entry			@ 14 - PendSV
-	.long	__invalid_entry			@ 15 - SysTick
+	.long	__systick_entry			@ 15 - SysTick
 	.rept	255 - 16
 	.long	__invalid_entry			@ 16..255 - External Interrupts
 	.endr

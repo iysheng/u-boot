@@ -24,7 +24,7 @@
 
 #include <common.h>
 #include <asm/io.h>
-
+#include <asm/armv7m.h>
 DECLARE_GLOBAL_DATA_PTR;
 
 /* SysTick Base Address - fixed for all Cortex M3, M4 and M7 devices */
@@ -37,8 +37,14 @@ struct cm3_systick {
 	uint32_t calibration;
 };
 
+#ifdef YYFISH_BOARD
+#define TIMER_MAX_VAL		CONFIG_SYS_HZ_CLOCK
+#else
 #define TIMER_MAX_VAL		0x00FFFFFF
+#endif
+
 #define SYSTICK_CTRL_EN		BIT(0)
+#define SYSTICK_CTRL_INT_EN		BIT(1)
 /* Clock source: 0 = Ref clock, 1 = CPU clock */
 #define SYSTICK_CTRL_CPU_CLK	BIT(2)
 #define SYSTICK_CAL_NOREF	BIT(31)
@@ -66,11 +72,11 @@ int timer_init(void)
 	cal = readl(&systick->calibration);
 	if (cal & SYSTICK_CAL_NOREF)
 		/* Use CPU clock, no interrupts */
-		writel(SYSTICK_CTRL_EN | SYSTICK_CTRL_CPU_CLK, &systick->ctrl);
+		writel(SYSTICK_CTRL_EN | SYSTICK_CTRL_INT_EN | SYSTICK_CTRL_CPU_CLK,\
+		&systick->ctrl);
 	else
 		/* Use external clock, no interrupts */
-		writel(SYSTICK_CTRL_EN, &systick->ctrl);
-
+		writel(SYSTICK_CTRL_EN | SYSTICK_CTRL_INT_EN, &systick->ctrl);
 	/*
 	 * If the TENMS field is inexact or wrong, specify the clock rate using
 	 * CONFIG_SYS_HZ_CLOCK.
@@ -96,6 +102,7 @@ ulong get_timer(ulong base)
 	return (ulong)((t / gd->arch.timer_rate_hz)) - base;
 }
 
+#ifndef CONFIG_TIMER
 unsigned long long get_ticks(void)
 {
 	u32 now = read_timer();
@@ -114,3 +121,4 @@ ulong get_tbclk(void)
 {
 	return gd->arch.timer_rate_hz;
 }
+#endif

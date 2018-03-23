@@ -6,7 +6,9 @@
  */
 
 #include <common.h>
-
+#ifdef CONFIG_CPU_V7M
+#include <asm/armv7m.h>
+#endif
 /*
  * Upon exception entry ARMv7-M processors automatically save stack
  * frames containing some registers. For simplicity initial
@@ -30,16 +32,26 @@ struct autosave_regs {
 
 int interrupt_init(void)
 {
+#if CONFIG_CPU_V7M
+    uint32_t reg_value = 0;
+    reg_value = V7M_SCB->aircr;
+    reg_value &= ~((V7M_AIRCR_PRIGROUP_MSK) | (0xffff << V7M_AIRCR_VECTKEY_SHIFT));
+    reg_value |= ((V7M_AIRCR_VECTKEY << V7M_AIRCR_VECTKEY_SHIFT) | \
+        (V7M_NVIC_GROUP_3 << V7M_AIRCR_PRIGROUP_SHIFT));
+    V7M_SCB->aircr = reg_value;
+#endif
 	return 0;
 }
 
 void enable_interrupts(void)
 {
+    asm volatile ("cpsie i" : : : "memory");
 	return;
 }
 
 int disable_interrupts(void)
 {
+    asm volatile ("cpsid i" : : : "memory");
 	return 0;
 }
 
@@ -86,10 +98,17 @@ void do_usage_fault(struct autosave_regs *autosave_regs)
 	dump_regs(autosave_regs);
 	bad_mode();
 }
-
 void do_invalid_entry(struct autosave_regs *autosave_regs)
 {
 	printf("Exception\n");
 	dump_regs(autosave_regs);
 	bad_mode();
 }
+
+extern void yyfish_led_toggle(void);
+
+void do_systick_entry(void)
+{
+    yyfish_led_toggle();
+}
+

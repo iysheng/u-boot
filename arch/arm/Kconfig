@@ -1224,6 +1224,8 @@ source "arch/arm/mach-mvebu/Kconfig"
 
 source "arch/arm/cpu/armv7/ls102xa/Kconfig"
 
+source "arch/arm/cpu/armv7m/Kconfig"
+
 source "arch/arm/mach-imx/mx2/Kconfig"
 
 source "arch/arm/mach-imx/mx5/Kconfig"

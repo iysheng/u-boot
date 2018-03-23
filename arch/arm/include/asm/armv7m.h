@@ -56,6 +56,10 @@ struct v7m_scb {
 #define V7M_AIRCR_PRIGROUP_MSK		(0x7 << V7M_AIRCR_PRIGROUP_SHIFT)
 #define V7M_AIRCR_SYSRESET		(1 << 2)
 
+#define V7M_NVIC_GROUP_3         ((uint32_t)0x00000004U)
+#define V7M_NVIC_GROUP_4         ((uint32_t)0x00000003U) 
+
+
 #define V7M_ICSR_VECTACT_MSK		0xFF
 
 #define V7M_CCR_DCACHE			16
