@@ -116,6 +116,7 @@ static const struct stm32_clk_info stm32f4_clk_info = {
 };
 
 static const struct stm32_clk_info stm32f7_clk_info = {
+#ifndef YYFISH_BOARD
 	/* 200 MHz */
 	.sys_pll_psc = {
 		.pll_n = 400,
@@ -125,6 +126,17 @@ static const struct stm32_clk_info stm32f7_clk_info = {
 		.apb1_psc = APB_PSC_4,
 		.apb2_psc = APB_PSC_2,
 	},
+#else
+	/* 100 MHz */
+	.sys_pll_psc = {
+		.pll_n = 200,
+		.pll_p = 2,
+		.pll_q = 8,
+		.ahb_psc = AHB_PSC_1,
+		.apb1_psc = APB_PSC_4,
+		.apb2_psc = APB_PSC_2,
+	},
+#endif
 	.has_overdrive = true,
 	.v2 = true,
 };
@@ -330,7 +342,6 @@ static u32 stm32_get_hclk_rate(struct stm32_rcc_regs *regs, u32 sysclk)
 	shift = ahb_psc_table[(
 		(readl(&regs->cfgr) & RCC_CFGR_AHB_PSC_MASK)
 		>> RCC_CFGR_HPRE_SHIFT)];
-
 	return sysclk >> shift;
 };
 
@@ -406,7 +417,6 @@ static ulong stm32_clk_get_rate(struct clk *clk)
 	} else {
 		return -EINVAL;
 	}
-
 	switch (clk->id) {
 	/*
 	 * AHB CLOCK: 3 x 32 bits consecutive registers are used :
@@ -609,7 +619,6 @@ static int stm32_clk_probe(struct udevice *dev)
 	int err;
 
 	debug("%s\n", __func__);
-
 	struct stm32_clk *priv = dev_get_priv(dev);
 	fdt_addr_t addr;
 
@@ -656,7 +665,6 @@ static int stm32_clk_probe(struct udevice *dev)
 	 */
 	clk.id = 0;
 	priv->hse_rate = clk_get_rate(&clk);
-
 	if (priv->hse_rate < 1000000) {
 		pr_err("%s: unexpected HSE clock rate = %ld \"n", __func__,
 		       priv->hse_rate);
@@ -674,11 +682,10 @@ static int stm32_clk_probe(struct udevice *dev)
 			return err;
 		}
 
-		priv->pwr_regs = (struct stm32_pwr_regs *)ofnode_get_addr(args.node);
+priv->pwr_regs = (struct stm32_pwr_regs *)ofnode_get_addr(args.node);
 	}
 
 	configure_clocks(dev);
-
 	return 0;
 }
 

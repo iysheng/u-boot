@@ -85,7 +85,7 @@ static void nand_init_chip(int i)
 	struct mtd_info *mtd = nand_to_mtd(nand);
 	ulong base_addr = base_address[i];
 	int maxchips = CONFIG_SYS_NAND_MAX_CHIPS;
-
+   
 	if (maxchips < 1)
 		maxchips = 1;
 

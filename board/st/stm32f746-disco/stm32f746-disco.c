@@ -15,6 +15,7 @@
 #include <asm/arch/gpio.h>
 #include <asm/arch/syscfg.h>
 #include <asm/gpio.h>
+#include <clk.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -28,14 +29,14 @@ int get_memory_base_size(fdt_addr_t *mr_base, fdt_addr_t *mr_size)
 	*mr_base = fdtdec_get_addr_size_auto_noparent(gd->fdt_blob, mr_node,
 						      "reg", 0, mr_size, false);
 	debug("mr_base = %lx, mr_size= %lx\n", *mr_base, *mr_size);
-
+    
 	return 0;
 }
 int dram_init(void)
 {
 	int rv;
 	fdt_addr_t mr_base, mr_size;
-
+#undef CONFIG_SUPPORT_SPL
 #ifndef CONFIG_SUPPORT_SPL
 	struct udevice *dev;
 	rv = uclass_get_device(UCLASS_RAM, 0, &dev);
@@ -46,6 +47,7 @@ int dram_init(void)
 
 #endif
 	rv = get_memory_base_size(&mr_base, &mr_size);
+
 	if (rv)
 		return rv;
 	gd->ram_size = mr_size;
@@ -63,7 +65,6 @@ int dram_init_banksize(void)
 	 */
 	gd->bd->bi_dram[0].start = mr_base;
 	gd->bd->bi_dram[0].size  = mr_size;
-
 	return 0;
 }
 
@@ -121,9 +122,9 @@ int board_late_init(void)
 				   GPIOD_IS_OUT);
 
 	if (dm_gpio_is_valid(&gpio)) {
-		dm_gpio_set_value(&gpio, 0);
-		mdelay(10);
 		dm_gpio_set_value(&gpio, 1);
+		mdelay(10);
+		dm_gpio_set_value(&gpio, 0);
 	}
 
 	/* read button 1*/
@@ -155,3 +156,36 @@ int board_init(void)
 
 	return 0;
 }
+
+int set_cpu_clk_info(void)
+{
+    int ret = 0;
+    unsigned long freq = 0;
+    struct clk clk_tmp;
+    struct udevice *fixed_clock_dev = NULL;
+    puts("CPU_CLK: ");
+    ret = uclass_get_device_by_name(UCLASS_CLK, "stm32fx_rcc_clock",
+					&fixed_clock_dev);
+    if (ret < 0)
+    {
+        debug("Failed to get device clk-hse :%d\n", ret);
+        return ret;
+    }
+    ret= clk_request(fixed_clock_dev, &clk_tmp);
+    if (ret < 0)
+    {
+        debug("Failed to request clk :%d\n", ret);
+        return ret;
+    }
+    clk_tmp.id = 0;
+    freq = clk_get_rate(&clk_tmp);
+    if (freq == 0)
+    {
+        debug("Failed to get rate\n");
+        return ret;
+    }
+    gd->cpu_clk = gd->bd->bi_arm_freq = freq;
+    printf("%lu MHz\n", freq/1000000);
+    return 0;    
+}
+

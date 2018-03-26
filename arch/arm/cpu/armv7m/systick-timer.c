@@ -38,7 +38,7 @@ struct cm3_systick {
 };
 
 #ifdef YYFISH_BOARD
-#define TIMER_MAX_VAL		CONFIG_SYS_HZ_CLOCK
+#define TIMER_MAX_VAL		(CONFIG_SYS_CLK_FREQ / 8)
 #else
 #define TIMER_MAX_VAL		0x00FFFFFF
 #endif
@@ -70,13 +70,17 @@ int timer_init(void)
 	writel(0, &systick->current_val);
 
 	cal = readl(&systick->calibration);
+    
 	if (cal & SYSTICK_CAL_NOREF)
 		/* Use CPU clock, no interrupts */
-		writel(SYSTICK_CTRL_EN | SYSTICK_CTRL_INT_EN | SYSTICK_CTRL_CPU_CLK,\
+		writel(SYSTICK_CTRL_EN | SYSTICK_CTRL_CPU_CLK,\
 		&systick->ctrl);
 	else
 		/* Use external clock, no interrupts */
-		writel(SYSTICK_CTRL_EN | SYSTICK_CTRL_INT_EN, &systick->ctrl);
+		writel(SYSTICK_CTRL_EN , &systick->ctrl);
+#ifdef YYFISH_BOARD
+    writel(readl(&systick->ctrl) | SYSTICK_CTRL_INT_EN , &systick->ctrl);
+#endif
 	/*
 	 * If the TENMS field is inexact or wrong, specify the clock rate using
 	 * CONFIG_SYS_HZ_CLOCK.

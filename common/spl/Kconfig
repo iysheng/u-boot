@@ -2,9 +2,11 @@ menu "SPL / TPL"
 
 config SUPPORT_SPL
 	bool
+	prompt "Support SPL"
 
 config SUPPORT_TPL
 	bool
+	prompt "Support TPL"
 
 config SPL_DFU_NO_RESET
 	bool
