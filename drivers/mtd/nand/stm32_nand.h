@@ -7,25 +7,17 @@
 #ifndef __STM32_NAND_H
 #define __STM32_NAND_H
 
-
-#define FMC_CONTROL_BASE    0xA0000000
-#define FMC_CONTROL_NAND_BASE   (FMC_CONTROL_BASE + 0x80)
-
-struct fmc_nand {
-	uint32_t pcr; /* nand control register */
-    uint32_t sr;
-    uint32_t pmem;
-    uint32_t patt;
-    uint32_t reserved1[1];
-    uint32_t eccr;
-    uint32_t reserved2[27];
-};
-
-#define MT29F4G08ABADA			0XDC909556
+#define FMC_PWAIT_EN        1
+#define FMC_PWAIT_DIS       0
+#define FMC_PWAIT_SHIFT     1
 
 #define FMC_PWID_8          0
 #define FMC_PWID_SHIFT      4
 #define FMC_PWID_MASK       ~(0X3 << FMC_TCLR_SHIFT)
+
+#define FMC_ECC_EN          1
+#define FMC_ECC_DIS         0
+#define FMC_ECC_SHIFT       6
 
 #define FMC_TCLR_6          (6 - 1)
 #define FMC_TCLR_SHIFT      9
@@ -49,6 +41,5 @@ struct fmc_nand {
 #define MEMHIZ_SHIFT        24
 
 #define FMC_NAND_MEM_EN		BIT(2)
-#define FMC_NAND_BASE       ((struct fmc_nand *)FMC_CONTROL_NAND_BASE)
 #endif
 

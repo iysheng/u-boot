@@ -43,6 +43,7 @@
 /dts-v1/;
 #include "stm32f746.dtsi"
 #include <dt-bindings/memory/stm32-sdram.h>
+#include <dt-bindings/memory/stm32-nand.h>
 
 / {
 	model = "STM32F767IGT YYFISH board";
@@ -84,6 +85,7 @@
 		compatible = "st,button1";
 		button-gpio = <&gpioa 0 0>;
 	};
+    
 };
 
 &clk_hse {
@@ -199,6 +201,8 @@
 	pinctrl-0 = <&fmc_pins>;
 	pinctrl-names = "default";
 	status = "okay";
+    #address-cells = <1>;
+    #size-cells = <1>;
 
 	/* Memory configuration from sdram datasheet MT48LC_4M32_B2B5-6A */
 	bank1: bank@0 {
@@ -210,6 +214,18 @@
 		/* refcount = (64msec/total_row_sdram)*freq - 20 */
 	       st,sdram-refcount = < 1421 >;
        };
+    bank3: stm32_nand {
+        reg = <0xA0000080 0x20>;
+        /* Baseaddr cmdaddr dataaddr*/
+        st,nand-ranges = /bits/ 32 <0x80000000 0x00010000 0x00020000>;
+        /*Nand flash configuretion from flash datasheet MT29F4G08ABADA*/
+        compatible = "micron,mt29f4g", "st,nand-flash";
+        st,nand-control = /bits/ 8 <FMC_PWAIT_DIS FMC_PWID_8 FMC_ECC_DIS 
+            FMC_TCLR_6 FMC_TAR_6 FMC_ECCPS_512>;
+        st,nand-timing = /bits/ 8 <MEMSET_VALE_2 MEMWAIT_VALE_4 MEMHOLD_VALE_2
+            MEMHIZ_VALE_2>;
+        u-boot,dm-pre-reloc;
+    };
 };
 
 &mac {

@@ -22,9 +22,31 @@ on-board sdram memory attributes:
   trc
   trp
   trcd
+  
+- st,nand-ranges : parameters for nand ranges, in this order:
+  addr
+  cmd_pos
+  data_pos
+  
+- st,nand-control : parameters for nand configuration, in this order:
+  pwait;
+  pwid;
+  eccen;
+  tclr;
+  tar;
+  eccps
+  
+- st,nand-timing: timings for nand, in this order
+  memset
+  memwait
+  memhold
+  memhiz   
 
-There is device tree include file at :
+There are device tree include files at :
 include/dt-bindings/memory/stm32-sdram.h to define sdram control and timing
+parameters as MACROS.
+
+include/dt-bindings/memory/stm32-sdram.h to define nand control and timing
 parameters as MACROS.
 
 Example:
@@ -39,6 +61,8 @@ Example:
 		pinctrl-0 = <&fmc_pins>;
 		pinctrl-names = "default";
 		status = "okay";
+		#address-cells = <1>;
+    	#size-cells = <1>;
 
 		/* sdram memory configuration from sdram datasheet */
 		bank1: bank@0 {
@@ -55,4 +79,19 @@ Example:
 		       st,sdram-timing = /bits/ 8 <TMRD_1 TXSR_60 TRAS_42 TRC_60 TRP_18
 						TRCD_18>;
 		};
+
+		bank3: stm32_nand {
+        reg = <0xA0000080 0x20>;
+        /* baseaddr cmdaddr_offset dataaddr_offset*/
+        st,nand-ranges = /bits/ 32 <0x80000000 0x10000 0x20000>;
+        /* nand flash configuretion from nand flash datasheet */
+        compatible = "micron,mt29f4g", "st,nand-flash";
+        st,nand-control = /bits/ 8 <FMC_PWAIT_DIS FMC_PWID_8 FMC_ECC_DIS 
+            FMC_TCLR_6 FMC_TAR_6 FMC_ECCPS_512>;
+        st,nand-timing = /bits/ 8 <MEMSET_VALE_2 MEMWAIT_VALE_4 MEMHOLD_VALE_2
+            MEMHIZ_VALE_2>;
+        u-boot,dm-pre-reloc;//Attention fmc relate controler and it's subnode must 
+        be probed before relocate,for after relocate code ,then we couldn't probe
+        fmc controler with sdram again
+    	};
 	}

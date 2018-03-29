@@ -8,6 +8,8 @@
 #include <common.h>
 #include <clk.h>
 #include <dm.h>
+#include <dm/lists.h>
+#include <dm/device-internal.h>
 #include <ram.h>
 #include <asm/io.h>
 
@@ -219,7 +221,7 @@ int stm32_sdram_init(struct udevice *dev)
 			ctb = FMC_SDCMR_BANK_2;
 
 		writel(ctb | FMC_SDCMR_MODE_START_CLOCK, &regs->sdcmr);
-		udelay(200);	/* 200 us delay, page 10, "Power-Up" */
+		udelay(1000);	/* 1000 us delay, page 10, "Power-Up" */
 		FMC_BUSY_WAIT(regs);
 
 		writel(ctb | FMC_SDCMR_MODE_PRECHARGE, &regs->sdcmr);
@@ -285,10 +287,15 @@ static int stm32_fmc_ofdata_to_platdata(struct udevice *dev)
 	dev_for_each_subnode(bank_node, dev) {
 		/* extract the bank index from DT */
 		bank_name = (char *)ofnode_get_name(bank_node);
+        if (!strncmp("stm32_nand", bank_name, strlen("stm32_nand")))//iysheng
+        {   
+            continue;
+        }
+
 		strsep(&bank_name, "@");
 		if (!bank_name) {
 			pr_err("missing sdram bank index");
-			return -EINVAL;
+            return -EINVAL;
 		}
 
 		bank_params = &params->bank_params[bank];
@@ -328,7 +335,6 @@ static int stm32_fmc_ofdata_to_platdata(struct udevice *dev)
 			return -EINVAL;
 		}
 
-
 		bank_params->sdram_ref_count = ofnode_read_u32_default(bank_node,
 						"st,sdram-refcount", 8196);
 		bank++;
@@ -345,7 +351,6 @@ static int stm32_fmc_probe(struct udevice *dev)
 	struct stm32_sdram_params *params = dev_get_platdata(dev);
 	int ret;
 	fdt_addr_t addr;
-
 	addr = dev_read_addr(dev);
 	if (addr == FDT_ADDR_T_NONE)
 		return -EINVAL;
@@ -370,8 +375,16 @@ static int stm32_fmc_probe(struct udevice *dev)
 	ret = stm32_sdram_init(dev);
 	if (ret)
 		return ret;
-
-	return 0;
+    if (device_has_children(dev)) {
+        struct udevice * child_devp;
+        int index = 0;
+        while(!device_get_child(dev, index++, &child_devp)) { 
+            ret = device_probe(child_devp);
+            if (ret < 0)
+                break;
+        }
+    }
+	return ret;
 }
 
 static int stm32_fmc_get_info(struct udevice *dev, struct ram_info *info)
@@ -379,9 +392,39 @@ static int stm32_fmc_get_info(struct udevice *dev, struct ram_info *info)
 	return 0;
 }
 
+int stm32_fmc_pre_probe(struct udevice *dev)
+{
+    int ret = 0;    
+#ifdef CONFIG_CLK
+	struct clk clk;
+
+	ret = clk_get_by_index(dev->parent, 0, &clk);
+	if (ret < 0)
+		return ret;
+
+	ret = clk_enable(&clk);
+
+	if (ret) {
+		dev_err(dev, "failed to enable clock\n");
+		return ret;
+	}
+#endif
+    return 0;
+}
+
+static int stm32_fmc_bind(struct udevice *dev)
+{
+    static int tmp = 0;
+    tmp++;
+#if CONFIG_IS_ENABLED(OF_PLATDATA)
+	return 0;
+#else
+	return dm_scan_fdt_dev(dev);
+#endif
+}
+
 static struct ram_ops stm32_fmc_ops = {
-	.get_info = stm32_fmc_get_info,
-};
+	.get_info = stm32_fmc_get_info,};
 
 static const struct udevice_id stm32_fmc_ids[] = {
 	{ .compatible = "st,stm32-fmc", .data = STM32F7_FMC },
@@ -396,5 +439,7 @@ U_BOOT_DRIVER(stm32_fmc) = {
 	.ops = &stm32_fmc_ops,
 	.ofdata_to_platdata = stm32_fmc_ofdata_to_platdata,
 	.probe = stm32_fmc_probe,
+	.bind = stm32_fmc_bind,
+	.child_pre_probe = stm32_fmc_pre_probe,
 	.platdata_auto_alloc_size = sizeof(struct stm32_sdram_params),
 };

@@ -69,7 +69,11 @@ struct nand_flash_dev nand_flash_ids[] = {
 		{ .id = {0xad, 0xde, 0x14, 0xa7, 0x42, 0x4a} },
 		  SZ_16K, SZ_8K, SZ_4M, NAND_NEED_SCRAMBLING, 6, 1664,
 		  NAND_ECC_INFO(56, SZ_1K), 1 },
-
+#ifdef YYFISH_BOARD
+    {"MT29F4G08ABADA",
+		{ .id = {0x2C, 0xDC, 0x90, 0x95, 0x56} },
+		  SZ_2K, SZ_4K, SZ_128K, 0, 5, 64, NAND_ECC_INFO(2, SZ_512) },
+#endif
 	LEGACY_ID_NAND("NAND 4MiB 5V 8-bit",   0x6B, 4, SZ_8K, SP_OPTIONS),
 	LEGACY_ID_NAND("NAND 4MiB 3,3V 8-bit", 0xE3, 4, SZ_8K, SP_OPTIONS),
 	LEGACY_ID_NAND("NAND 4MiB 3,3V 8-bit", 0xE5, 4, SZ_8K, SP_OPTIONS),
