@@ -58,7 +58,6 @@ int nand_register(int devnum, struct mtd_info *mtd)
 		return -EINVAL;
 
 	nand_info[devnum] = mtd;
-
 	sprintf(dev_name[devnum], "nand%d", devnum);
 	mtd->name = dev_name[devnum];
 
@@ -93,10 +92,8 @@ static void nand_init_chip(int i)
 
 	if (board_nand_init(nand))
 		return;
-
 	if (nand_scan(mtd, maxchips))
 		return;
-
 	nand_register(i, mtd);
 }
 #endif

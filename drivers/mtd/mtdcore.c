@@ -419,7 +419,10 @@ int add_mtd_device(struct mtd_info *mtd)
 
 	BUG_ON(mtd->writesize == 0);
 	mutex_lock(&mtd_table_mutex);
-
+    /*
+     * add mtd device to struct idr mtd_idr manager
+     * comment by <iysheng@163.com>
+     */
 	i = idr_alloc(&mtd_idr, mtd, 0, 0, GFP_KERNEL);
 	if (i < 0)
 		goto fail_locked;

@@ -72,6 +72,18 @@ static struct phy_driver lan8710_driver = {
 	.startup = &genphy_startup,
 	.shutdown = &genphy_shutdown,
 };
+    
+#ifdef YYFISH_BOARD
+static struct phy_driver lan8720_driver = {
+	.name = "SMSC LAN8710/LAN8720",
+	.uid = 0xffffffff,/*just for test*/
+	.mask = 0xffff0,
+	.features = PHY_BASIC_FEATURES,
+	.config = &genphy_config_aneg,
+	.startup = &genphy_startup,
+	.shutdown = &genphy_shutdown,
+};
+#endif
 
 static struct phy_driver lan8740_driver = {
 	.name = "SMSC LAN8740",
@@ -106,6 +118,9 @@ static struct phy_driver lan8742_driver = {
 int phy_smsc_init(void)
 {
 	phy_register(&lan8710_driver);
+#ifdef YYFISH_BOARD
+    phy_register(&lan8720_driver);
+#endif
 	phy_register(&lan911x_driver);
 	phy_register(&lan8700_driver);
 	phy_register(&lan8740_driver);

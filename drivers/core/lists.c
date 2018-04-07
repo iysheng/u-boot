@@ -51,6 +51,7 @@ struct uclass_driver *lists_uclass_lookup(enum uclass_id id)
 
 int lists_bind_drivers(struct udevice *parent, bool pre_reloc_only)
 {
+    //struct driver_info is definede by macro U_BOOT_DEVICE
 	struct driver_info *info =
 		ll_entry_start(struct driver_info, driver_info);
 	const int n_ents = ll_entry_count(struct driver_info, driver_info);

@@ -116,7 +116,7 @@ static const struct stm32_clk_info stm32f4_clk_info = {
 };
 
 static const struct stm32_clk_info stm32f7_clk_info = {
-#ifndef YYFISH_BOARD
+#ifdef YYFISH_BOARD
 	/* 200 MHz */
 	.sys_pll_psc = {
 		.pll_n = 400,

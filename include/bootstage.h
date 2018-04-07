@@ -382,9 +382,10 @@ static inline ulong bootstage_error(enum bootstage_id id)
 	return 0;
 }
 
+//go here stm32
 static inline ulong bootstage_mark_name(enum bootstage_id id, const char *name)
 {
-	show_boot_progress(id);
+	show_boot_progress(id);//NULL 
 	return 0;
 }
 

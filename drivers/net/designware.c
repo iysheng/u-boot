@@ -39,13 +39,27 @@ static int dw_mdio_read(struct mii_dev *bus, int addr, int devad, int reg)
 
 	miiaddr = ((addr << MIIADDRSHIFT) & MII_ADDRMSK) |
 		  ((reg << MIIREGSHIFT) & MII_REGMSK);
-
+#ifndef YYFISH_BOARD
 	writel(miiaddr | MII_CLKRANGE_150_250M | MII_BUSY, &mac_p->miiaddr);
-
+#else
+    writel(miiaddr | MII_CLKRANGE_100_150M | MII_BUSY, &mac_p->miiaddr);
+#endif
 	start = get_timer(0);
 	while (get_timer(start) < timeout) {
+        #ifndef YYFISH_BOARD
 		if (!(readl(&mac_p->miiaddr) & MII_BUSY))
 			return readl(&mac_p->miidata);
+        #else
+        static int tmp_test = 0;
+        tmp_test = readl(&mac_p->miiaddr);
+        
+        if (!(tmp_test & MII_BUSY)) {
+            tmp_test = readl(&mac_p->miidata);
+            printf("iysheng %s reg=%d val=%08x\n", __func__, reg, 
+                tmp_test);
+            return tmp_test;
+            }
+        #endif
 		udelay(10);
 	};
 
@@ -68,9 +82,13 @@ static int dw_mdio_write(struct mii_dev *bus, int addr, int devad, int reg,
 	writel(val, &mac_p->miidata);
 	miiaddr = ((addr << MIIADDRSHIFT) & MII_ADDRMSK) |
 		  ((reg << MIIREGSHIFT) & MII_REGMSK) | MII_WRITE;
-
+#ifndef YYFISH_BOARD
 	writel(miiaddr | MII_CLKRANGE_150_250M | MII_BUSY, &mac_p->miiaddr);
-
+#else
+    writel(miiaddr | MII_CLKRANGE_100_150M | MII_BUSY, &mac_p->miiaddr);
+    printf("iysheng %s *******************reg=%d val=%04x\n", __func__, reg,
+        val);
+#endif
 	start = get_timer(0);
 	while (get_timer(start) < timeout) {
 		if (!(readl(&mac_p->miiaddr) & MII_BUSY)) {
@@ -95,12 +113,13 @@ static int dw_mdio_reset(struct mii_dev *bus)
 		return 0;
 
 	/* reset the phy */
+/*
 	ret = dm_gpio_set_value(&priv->reset_gpio, 0);
 	if (ret)
 		return ret;
-
+    
 	udelay(pdata->reset_delays[0]);
-
+*/
 	ret = dm_gpio_set_value(&priv->reset_gpio, 1);
 	if (ret)
 		return ret;
@@ -112,7 +131,6 @@ static int dw_mdio_reset(struct mii_dev *bus)
 		return ret;
 
 	udelay(pdata->reset_delays[2]);
-
 	return 0;
 }
 #endif
@@ -129,7 +147,9 @@ static int dw_mdio_init(const char *name, void *priv)
 	bus->read = dw_mdio_read;
 	bus->write = dw_mdio_write;
 	snprintf(bus->name, sizeof(bus->name), "%s", name);
+    printf("iysheng %s bus->name=%s\n", __func__, bus->name);
 #if defined(CONFIG_DM_ETH) && defined(CONFIG_DM_GPIO)
+    /* reset func added comment by <iysheng@163.com>*/
 	bus->reset = dw_mdio_reset;
 #endif
 
@@ -284,6 +304,7 @@ int designware_eth_init(struct dw_eth_dev *priv, u8 *enetaddr)
 	writel(readl(&dma_p->busmode) | DMAMAC_SRST, &dma_p->busmode);
 
 	start = get_timer(0);
+
 	while (readl(&dma_p->busmode) & DMAMAC_SRST) {
 		if (get_timer(start) >= CONFIG_MACRESET_TIMEOUT) {
 			printf("DMA reset timeout\n");

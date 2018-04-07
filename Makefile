@@ -826,7 +826,9 @@ LDFLAGS_u-boot += $(LDFLAGS_FINAL)
 LDFLAGS_u-boot += $(call ld-option, --no-dynamic-linker)
 
 ifeq ($(CONFIG_ARC)$(CONFIG_NIOS2)$(CONFIG_X86)$(CONFIG_XTENSA),)
+$(info "iysheng"$(CONFIG_SYS_TEXT_BASE))
 LDFLAGS_u-boot += -Ttext $(CONFIG_SYS_TEXT_BASE)
+#LDFLAGS_u-boot += -Ttext 0x08000000
 endif
 
 # Normally we fill empty space with 0xff
@@ -1308,7 +1310,7 @@ cmd_smap = \
 		awk '$$2 ~ /[tTwW]/ {printf $$1 $$3 "\\\\000"}'` ; \
 	$(CC) $(c_flags) -DSYSTEM_MAP="\"$${smap}\"" \
 		-c $(srctree)/common/system_map.c -o common/system_map.o
-
+$(info "iysheng"$(cmd_u-boot__))
 u-boot:	$(u-boot-init) $(u-boot-main) u-boot.lds FORCE
 	+$(call if_changed,u-boot__)
 ifeq ($(CONFIG_KALLSYMS),y)

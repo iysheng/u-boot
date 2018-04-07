@@ -26,6 +26,5 @@ int __weak show_board_info(void)
 	if (model)
 		printf("Model: %s\n", model);
 #endif
-
 	return checkboard();
 }

@@ -61,7 +61,7 @@
 	aliases {
 		serial0 = &usart1;
 		spi0 = &qspi;
-		mmc0 = &sdio2;
+		mmc0 = &sdio;
 		/* Aliases for gpios so as to use sequence */
 		gpio0 = &gpioa;
 		gpio1 = &gpiob;
@@ -110,7 +110,7 @@
 	      pins {
 		      pinmux = <STM32F746_PG13_FUNC_ETH_MII_TXD0_ETH_RMII_TXD0>,
 			     <STM32F746_PG14_FUNC_ETH_MII_TXD1_ETH_RMII_TXD1>,
-			     <STM32F746_PG11_FUNC_ETH_MII_TX_EN_ETH_RMII_TX_EN>,
+			     <STM32F746_PB11_FUNC_ETH_MII_TX_EN_ETH_RMII_TX_EN>,
 			     <STM32F746_PA2_FUNC_ETH_MDIO>,
 			     <STM32F746_PC1_FUNC_ETH_MDC>,
 			     <STM32F746_PA1_FUNC_ETH_MII_RX_CLK_ETH_RMII_REF_CLK>,
@@ -189,6 +189,37 @@
 			  slew-rate = <2>;
 		  };
 	  };
+      
+    mmc0_pins_b: sdio_pins_b@0 {
+        pins {
+            pinmux = <STM32F746_PC8_FUNC_SDMMC1_D0>,
+                 <STM32F746_PC9_FUNC_SDMMC1_D1>,
+                 <STM32F746_PC10_FUNC_SDMMC1_D2>,
+                 <STM32F746_PC11_FUNC_SDMMC1_D3>,
+                 <STM32F746_PC12_FUNC_SDMMC1_CK>,
+                 <STM32F746_PD2_FUNC_SDMMC1_CMD>;
+            drive-push-pull;
+            slew-rate = <2>;
+        };
+    };
+    
+    mmc0_pins_od_b: sdio_pins_od_b@0 {
+        pins1 {
+            pinmux = <STM32F746_PC8_FUNC_SDMMC1_D0>,
+                 <STM32F746_PC9_FUNC_SDMMC1_D1>,
+                 <STM32F746_PC10_FUNC_SDMMC1_D2>,
+                 <STM32F746_PC11_FUNC_SDMMC1_D3>,
+                 <STM32F746_PC12_FUNC_SDMMC1_CK>;
+            drive-push-pull;
+            slew-rate = <2>;
+        };
+    
+        pins2 {
+            pinmux = <STM32F746_PD2_FUNC_SDMMC1_CMD>;
+            drive-open-drain;
+            slew-rate = <2>;
+        };
+    };
 };
 
 &usart1 {
@@ -229,11 +260,17 @@
 };
 
 &mac {
-	status = "disable";
+	status = "okay";
 	pinctrl-0 = <&ethernet_mii>;
 	phy-mode = "rmii";
 	phy-handle = <&phy0>;
-
+    snps,reset-gpio = <&gpiof 9 1>; /*PF9<-->ETH_RESET*/
+    snps,reset-active-low;
+    snps,reset-delays-us = <100000 100000 100000>;
+    snps,mixed-burst;
+    snps,multicast-filter-bins = <256>;
+    snps,perfect-filter-entries = <128>;
+    
 	mdio0 {
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -260,13 +297,12 @@
 	};
 };
 
-&sdio2 {
-	status = "disable";
-	cd-gpios = <&gpioi 15 0>;
-	cd-inverted;
+
+&sdio {
+	status = "okay";
 	pinctrl-names = "default", "opendrain";
-	pinctrl-0 = <&sdio_pins_b>;
-	pinctrl-1 = <&sdio_pins_od_b>;
+	pinctrl-0 = <&mmc0_pins_b>;
+	pinctrl-1 = <&mmc0_pins_od_b>;
 	bus-width = <4>;
 	max-frequency = <25000000>;
 };

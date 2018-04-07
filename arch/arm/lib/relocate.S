@@ -82,13 +82,11 @@ ENTRY(relocate_code)
 	subs	r4, r0, r1		/* r4 <- relocation offset */
 	beq	relocate_done		/* skip relocation */
 	ldr	r2, =__image_copy_end	/* r2 <- SRC &__image_copy_end */
-
 copy_loop:
 	ldmia	r1!, {r10-r11}		/* copy from source address [r1]    */
 	stmia	r0!, {r10-r11}		/* copy to   target address [r0]    */
-	cmp	r1, r2			/* until source end address [r2]    */
+    cmp	r1, r2			/* until source end address [r2]    */
 	blo	copy_loop
-
 	/*
 	 * fix .rel.dyn relocations
 	 */
@@ -119,12 +117,13 @@ relocate_done:
 	mcr	p15, 0, r0, c7, c7, 0	/* invalidate icache */
 	mcr	p15, 0, r0, c7, c10, 4	/* drain write buffer */
 #endif
+    
 
 	/* ARMv4- don't know bx lr but the assembler fails to see that */
 
 #ifdef __ARM_ARCH_4__
 	mov	pc, lr
-#else
+#else 
 	bx	lr
 #endif
 

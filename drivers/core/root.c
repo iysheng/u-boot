@@ -175,6 +175,9 @@ int dm_init(bool of_live)
 		DM_ROOT_NON_CONST->node = np_to_ofnode(gd->of_root);
 	else
 #endif
+        /*
+         * set root_node in gd varible comment by <iysheng@163.com>
+         */
 		DM_ROOT_NON_CONST->node = offset_to_ofnode(0);
 #endif
 	ret = device_probe(DM_ROOT_NON_CONST);
@@ -363,7 +366,6 @@ __weak int dm_scan_other(bool pre_reloc_only)
 int dm_init_and_scan(bool pre_reloc_only)
 {
 	int ret;
-
 	ret = dm_init(IS_ENABLED(CONFIG_OF_LIVE));
 	if (ret) {
 		debug("dm_init() failed: %d\n", ret);

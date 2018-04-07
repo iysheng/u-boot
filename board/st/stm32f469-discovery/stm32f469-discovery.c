@@ -19,6 +19,7 @@ int dram_init(void)
 	struct udevice *dev;
 
 	rv = uclass_get_device(UCLASS_RAM, 0, &dev);
+
 	if (rv) {
 		debug("DRAM init failed: %d\n", rv);
 		return rv;

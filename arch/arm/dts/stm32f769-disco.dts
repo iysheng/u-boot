@@ -54,7 +54,7 @@
 	};
 
 	memory {
-		reg = <0xC0000000 0x1000000>;
+		reg = <0xC0000000 0x2000000>;
 	};
 
 	aliases {
@@ -77,7 +77,7 @@
 
 	led1 {
 		compatible = "st,led1";
-		led-gpio = <&gpioj 5 0>;
+		led-gpio = <&gpioi 11 0>;
 	};
 
 	button1 {
@@ -133,23 +133,7 @@
 
 	fmc_pins: fmc@0 {
 		  pins {
-			  pinmux = <STM32F746_PI10_FUNC_FMC_D31>,
-				 <STM32F746_PI9_FUNC_FMC_D30>,
-				 <STM32F746_PI7_FUNC_FMC_D29>,
-				 <STM32F746_PI6_FUNC_FMC_D28>,
-				 <STM32F746_PI3_FUNC_FMC_D27>,
-				 <STM32F746_PI2_FUNC_FMC_D26>,
-				 <STM32F746_PI1_FUNC_FMC_D25>,
-				 <STM32F746_PI0_FUNC_FMC_D24>,
-				 <STM32F746_PH15_FUNC_FMC_D23>,
-				 <STM32F746_PH14_FUNC_FMC_D22>,
-				 <STM32F746_PH13_FUNC_FMC_D21>,
-				 <STM32F746_PH12_FUNC_FMC_D20>,
-				 <STM32F746_PH11_FUNC_FMC_D19>,
-				 <STM32F746_PH10_FUNC_FMC_D18>,
-				 <STM32F746_PH9_FUNC_FMC_D17>,
-				 <STM32F746_PH8_FUNC_FMC_D16>,
-
+			  pinmux = 
 				 <STM32F746_PD10_FUNC_FMC_D15>,
 				 <STM32F746_PD9_FUNC_FMC_D14>,
 				 <STM32F746_PD8_FUNC_FMC_D13>,
@@ -167,14 +151,13 @@
 				 <STM32F746_PD15_FUNC_FMC_D1>,
 				 <STM32F746_PD14_FUNC_FMC_D0>,
 
-				 <STM32F746_PI5_FUNC_FMC_NBL3>,
-				 <STM32F746_PI4_FUNC_FMC_NBL2>,
 				 <STM32F746_PE1_FUNC_FMC_NBL1>,
 				 <STM32F746_PE0_FUNC_FMC_NBL0>,
 
 				 <STM32F746_PG5_FUNC_FMC_A15_FMC_BA1>,
 				 <STM32F746_PG4_FUNC_FMC_A14_FMC_BA0>,
 
+				 <STM32F746_PG2_FUNC_FMC_A12>,
 				 <STM32F746_PG1_FUNC_FMC_A11>,
 				 <STM32F746_PG0_FUNC_FMC_A10>,
 				 <STM32F746_PF15_FUNC_FMC_A9>,
@@ -188,11 +171,11 @@
 				 <STM32F746_PF1_FUNC_FMC_A1>,
 				 <STM32F746_PF0_FUNC_FMC_A0>,
 
-				 <STM32F746_PH3_FUNC_FMC_SDNE0>,
-				 <STM32F746_PH5_FUNC_FMC_SDNWE>,
+				 <STM32F746_PC2_FUNC_FMC_SDNE0>,
+				 <STM32F746_PC0_FUNC_FMC_SDNWE>,
 				 <STM32F746_PF11_FUNC_FMC_SDNRAS>,
 				 <STM32F746_PG15_FUNC_FMC_SDNCAS>,
-				 <STM32F746_PH2_FUNC_FMC_SDCKE0>,
+				 <STM32F746_PC3_FUNC_FMC_SDCKE0>,
 				 <STM32F746_PG8_FUNC_FMC_SDCLK>;
 			  slew-rate = <2>;
 		  };
@@ -212,18 +195,18 @@
 
 	/* Memory configuration from sdram datasheet MT48LC_4M32_B2B5-6A */
 	bank1: bank@0 {
-	       st,sdram-control = /bits/ 8 <NO_COL_8 NO_ROW_12 MWIDTH_32 BANKS_4
+	       st,sdram-control = /bits/ 8 <NO_COL_9 NO_ROW_13 MWIDTH_16 BANKS_4
 	       				    CAS_3 SDCLK_2 RD_BURST_EN
-					    RD_PIPE_DL_0>;
-	       st,sdram-timing = /bits/ 8 <TMRD_2 TXSR_6 TRAS_4 TRC_6 TWR_2
+					    RD_PIPE_DL_1>;
+	       st,sdram-timing = /bits/ 8 <TMRD_2 TXSR_8 TRAS_7 TRC_7 TWR_2
 	       				   TRP_2 TRCD_2>;
 		/* refcount = (64msec/total_row_sdram)*freq - 20 */
-	       st,sdram-refcount = < 1542 >;
+	       st,sdram-refcount = < 1421 >;
        };
 };
 
 &mac {
-	status = "okay";
+	status = "disable";
 	pinctrl-0 = <&ethernet_mii>;
 	phy-mode = "rmii";
 	phy-handle = <&phy0>;
@@ -240,7 +223,7 @@
 
 &qspi {
 	pinctrl-0 = <&qspi_pins>;
-	status = "okay";
+	status = "disable";
 
 	qflash0: n25q128a {
 			#address-cells = <1>;
@@ -255,7 +238,7 @@
 };
 
 &sdio2 {
-	status = "okay";
+	status = "disable";
 	cd-gpios = <&gpioi 15 0>;
 	cd-inverted;
 	pinctrl-names = "default", "opendrain";

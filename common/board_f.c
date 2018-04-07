@@ -636,7 +636,7 @@ static int setup_reloc(void)
 	memcpy(gd->new_gd, (char *)gd, sizeof(gd_t));
 
 	debug("Relocation Offset is: %08lx\n", gd->reloc_off);
-	debug("Relocating to %08lx, new gd at %08lx, sp at %08lx\n",
+    debug("Relocating to %08lx, new gd at %08lx, sp at %08lx\n",
 	      gd->relocaddr, (ulong)map_to_sysmem(gd->new_gd),
 	      gd->start_addr_sp);
 
@@ -690,9 +690,10 @@ static int initf_bootstage(void)
 			IS_ENABLED(CONFIG_BOOTSTAGE_STASH);
 	int ret;
 
-	ret = bootstage_init(!from_spl);
+	ret = bootstage_init(!from_spl);//NULL operate
 	if (ret)
 		return ret;
+    //from_spl = false
 	if (from_spl) {
 		const void *stash = map_sysmem(CONFIG_BOOTSTAGE_STASH_ADDR,
 					       CONFIG_BOOTSTAGE_STASH_SIZE);
@@ -722,7 +723,6 @@ static int initf_dm(void)
 {
 #if defined(CONFIG_DM) && CONFIG_VAL(SYS_MALLOC_F_LEN)
 	int ret;
-
 	bootstage_start(BOOTSTATE_ID_ACCUM_DM_F, "dm_f");
 	ret = dm_init_and_scan(true);
 	bootstage_accum(BOOTSTATE_ID_ACCUM_DM_F);

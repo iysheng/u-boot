@@ -100,6 +100,7 @@ static int device_bind_common(struct udevice *parent, const struct driver *drv,
 			dev->flags |= DM_FLAG_ALLOC_PDATA;
 			dev->platdata = calloc(1,
 					       drv->platdata_auto_alloc_size);
+        printf("iysheng %s %s*********%s\n", __func__, dev->name,dev->driver->name);
 			if (!dev->platdata) {
 				ret = -ENOMEM;
 				goto fail_alloc1;
@@ -138,6 +139,7 @@ static int device_bind_common(struct udevice *parent, const struct driver *drv,
 	}
 
 	/* put dev into parent's successor list */
+    //successor:继承人 sibling:兄弟      added by <iysheng@163.com>
 	if (parent)
 		list_add_tail(&dev->sibling_node, &parent->child_head);
 
@@ -304,7 +306,10 @@ int device_probe(struct udevice *dev)
 
 	if (!dev)
 		return -EINVAL;
-
+    /*
+     * If this device has been probed then skip this probe function
+     * commant added by <iysheng@163.com>
+     */
 	if (dev->flags & DM_FLAG_ACTIVATED)
 		return 0;
 
@@ -343,8 +348,8 @@ int device_probe(struct udevice *dev)
 				goto fail;
 			}
 		}
-
 		ret = device_probe(dev->parent);
+        
 		if (ret)
 			goto fail;
 
@@ -357,7 +362,9 @@ int device_probe(struct udevice *dev)
 		if (dev->flags & DM_FLAG_ACTIVATED)
 			return 0;
 	}
-
+    /*
+     * Assign a seq to this device comment by <iysheng@163.com>
+     */
 	seq = uclass_resolve_seq(dev);
 	if (seq < 0) {
 		ret = seq;
@@ -385,7 +392,10 @@ int device_probe(struct udevice *dev)
 		if (ret)
 			goto fail;
 	}
-
+    /*
+     * here call the drv->ofdata_to_platdata function to get paramters with device
+     * comment added by <iysheng@163.com>
+     */
 	if (drv->ofdata_to_platdata && dev_has_of_node(dev)) {
 		ret = drv->ofdata_to_platdata(dev);
 		if (ret)

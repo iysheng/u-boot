@@ -36,8 +36,8 @@
 
 #define CONFIG_DW_GMAC_DEFAULT_DMA_PBL	(8)
 #define CONFIG_DW_ALTDESCRIPTOR
-/*#define CONFIG_MII*/
-/*#define CONFIG_PHY_SMSC*/
+#define CONFIG_MII
+#define CONFIG_PHY_SMSC
 
 #define CONFIG_SYS_CLK_FREQ		100000000 /* 100 MHz */
 #define CONFIG_SYS_HZ_CLOCK		1000000	/* Timer is clocked at 1MHz */

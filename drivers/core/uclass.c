@@ -208,7 +208,6 @@ int uclass_find_first_device(enum uclass_id id, struct udevice **devp)
 		return 0;
 
 	*devp = list_first_entry(&uc->dev_head, struct udevice, uclass_node);
-
 	return 0;
 }
 
@@ -238,8 +237,8 @@ int uclass_find_device_by_name(enum uclass_id id, const char *name,
 	ret = uclass_get(id, &uc);
 	if (ret)
 		return ret;
-
 	list_for_each_entry(dev, &uc->dev_head, uclass_node) {
+	    printf("iysheng %s %s\n", __func__, dev->name);
 		if (!strncmp(dev->name, name, strlen(name))) {
 			*devp = dev;
 			return 0;
@@ -476,8 +475,9 @@ int uclass_first_device(enum uclass_id id, struct udevice **devp)
 
 	*devp = NULL;
 	ret = uclass_find_first_device(id, &dev);
-	if (!dev)
+	if (!dev) 
 		return 0;
+    
 	return uclass_get_device_tail(dev, ret, devp);
 }
 

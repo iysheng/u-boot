@@ -97,7 +97,7 @@ static void env_set_inited(enum env_location location)
  * Returns:
  * an enum env_location value on success, a negative error code otherwise
  */
-__weak enum env_location env_get_location(enum env_operation op, int prio)
+__weak enum env_location env_get_location (enum env_operation op, int prio)
 {
 	switch (op) {
 	case ENVOP_GET_CHAR:
@@ -105,7 +105,6 @@ __weak enum env_location env_get_location(enum env_operation op, int prio)
 	case ENVOP_LOAD:
 		if (prio >= ARRAY_SIZE(env_locations))
 			return ENVL_UNKNOWN;
-
 		gd->env_load_location = env_locations[prio];
 		return gd->env_load_location;
 
@@ -221,7 +220,6 @@ int env_init(void)
 	struct env_driver *drv;
 	int ret = -ENOENT;
 	int prio;
-
 	for (prio = 0; (drv = env_driver_lookup(ENVOP_INIT, prio)); prio++) {
 		if (!drv->init || !(ret = drv->init()))
 			env_set_inited(drv->location);
