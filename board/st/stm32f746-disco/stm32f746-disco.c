@@ -189,3 +189,67 @@ int set_cpu_clk_info(void)
     return 0;    
 }
 
+#define YYFISH_LED
+
+#ifdef YYFISH_LED
+#define GPIO_I_REG_BASE 0x40022000U
+#define GPIO_B_REG_BASE 0x40020400U
+#define RCC_REG_BASE 0x40023800U
+#define RCC_CR 0X00U
+#define RCC_PLLCFGR 0x04U
+#define RCC_CFGR 0x08U
+#define RCC_CIR 0x0cU
+
+#define RCC_AHB1ENR_OFFSET 0X30U
+#define RCC_APB1ENR_OFFSET 0x40U
+#define PWR_REG_BASE 0x40007000U
+#define PWD_CR1 0x00U
+#define VTOR 0xe000ed08U
+typedef volatile unsigned int * REG_PTR;
+
+void yyfish_led_toggle(void)
+{
+    *(REG_PTR)(GPIO_I_REG_BASE + 0x14U) ^= (1 << 11);    
+}
+
+void yyfish_led_on(void)
+{
+    *(REG_PTR)(GPIO_I_REG_BASE + 0x14U) |= (1 << 11);
+}
+void yyfish_led_off(void)
+{
+    *(REG_PTR)(GPIO_I_REG_BASE + 0x14U) &= ~(1 << 11);
+}
+extern char __image_copy_start[];
+extern char __image_copy_end[];
+char * ptr_relocate = NULL;
+char * dest;
+
+void yyfish_relocate(void)
+{
+    dest = (char *)(gd->relocaddr);
+    ptr_relocate = &__image_copy_start[0];
+    printf("iysheng coming dest=%p ptr_relocate=%p __image_copy_end=%p %p\n",
+        dest, ptr_relocate, &__image_copy_end[0], __image_copy_end);
+    for ( ;(unsigned int)ptr_relocate <= (unsigned int)&__image_copy_end[0]; ptr_relocate++,dest++)
+    {
+        *dest = *ptr_relocate;
+    }
+    printf("%p <= %08x\n", ptr_relocate, (unsigned int)&__image_copy_end[0]);
+}
+
+void yyfish_put(int r0)
+{
+    int num = r0;
+    printf("iysheng r0=%08x\n", (unsigned int)num);
+}
+
+void yyfish_nprintf(uchar * src, int num)
+{
+    int i=0;
+    for (; i<num; i++);
+        //printf("%02x ", src[i]);
+    //puts("\r\n");
+}
+#endif
+

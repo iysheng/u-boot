@@ -105,6 +105,17 @@ struct tag_mem32 {
 	u32	start;	/* physical start address */
 };
 
+#ifdef CONFIG_DMAMEM_TAG
+/* dmamem parameters, all must be PAGE_SIZE aligned */
+#define ATAG_DMAMEM	0x5441000A
+
+struct tag_dmamem {
+	unsigned long	base;	/* base address of dmamem */
+	unsigned long	sz_all;	/* size of dmamem */
+	unsigned long	sz_fb;	/* size of fb at start of dmamem */
+};
+#endif
+
 /* VGA text type displays */
 #define ATAG_VIDEOTEXT	0x54410003
 
@@ -210,6 +221,9 @@ struct tag {
 	union {
 		struct tag_core		core;
 		struct tag_mem32	mem;
+#ifdef CONFIG_DMAMEM_TAG
+        struct tag_dmamem	dmamem;
+#endif
 		struct tag_videotext	videotext;
 		struct tag_ramdisk	ramdisk;
 		struct tag_initrd	initrd;

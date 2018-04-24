@@ -55,9 +55,8 @@
 	"run bootcmd_romfs"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
-	"bootargs_romfs=uclinux.physaddr=0x08180000 root=/dev/mtdblock0\0" \
-	"bootcmd_romfs=setenv bootargs ${bootargs} ${bootargs_romfs};" \
-	"bootm 0x08044000 - 0x08042000\0"
+	"bootcmd_romfs=setenv bootargs ${bootargs};fatload mmc 0 0xc0008000 yyfish.bin;" \
+	"bootm 0xc0008000\0"
 
 
 /*
@@ -85,6 +84,10 @@
 
 #define YYFISH_LED
 #define YYFISH_BOARD
+
+#ifndef CONFIG_DMAMEM_TAG
+#define CONFIG_DMAMEM_TAG
+#endif
 
 #define CONFIG_SYS_NAND_MAX_CHIPS       1
 #define CONFIG_SYS_MAX_NAND_DEVICE      CONFIG_SYS_NAND_MAX_CHIPS   

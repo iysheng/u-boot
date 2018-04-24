@@ -17,6 +17,7 @@ extern void udc_disconnect(void);
 		defined(CONFIG_CMDLINE_TAG) || \
 		defined(CONFIG_INITRD_TAG) || \
 		defined(CONFIG_SERIAL_TAG) || \
+		defined(CONFIG_DMAMEM_TAG) || \
 		defined(CONFIG_REVISION_TAG)
 # define BOOTM_ENABLE_TAGS		1
 #else
@@ -40,6 +41,13 @@ extern void udc_disconnect(void);
 #else
  #define BOOTM_ENABLE_INITRD_TAG	0
 #endif
+
+#ifdef CONFIG_DMAMEM_TAG
+ #define BOOTM_ENABLE_DMAMEM_TAG	1
+#else
+ #define BOOTM_ENABLE_DMAMEM_TAG	0
+#endif
+
 
 struct tag_serialnr;
 #ifdef CONFIG_SERIAL_TAG

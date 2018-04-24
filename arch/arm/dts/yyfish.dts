@@ -243,7 +243,7 @@
 	       st,sdram-timing = /bits/ 8 <TMRD_2 TXSR_8 TRAS_7 TRC_7 TWR_2
 	       				   TRP_2 TRCD_2>;
 		/* refcount = (64msec/total_row_sdram)*freq - 20 */
-	       st,sdram-refcount = < 1421 >;
+	       st,sdram-refcount = < 761 >;
        };
     bank3: stm32_nand {
         reg = <0xA0000080 0x20>;

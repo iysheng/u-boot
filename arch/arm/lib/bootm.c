@@ -142,6 +142,17 @@ static void setup_memory_tags(bd_t *bd)
 	}
 }
 
+#ifdef CONFIG_DMAMEM_TAG
+static void setup_dmamem_tag(bd_t *bd)
+{
+    params->hdr.tag = ATAG_DMAMEM;
+	params->hdr.size = tag_size (tag_dmamem);
+	params->u.dmamem.base = bd->bi_dram[0].start + bd->bi_dram[0].size / 2;
+	params->u.dmamem.sz_all = 0x100000;
+    params->u.dmamem.sz_fb = 0x1000;
+	params = tag_next (params);
+}
+#endif
 static void setup_commandline_tag(bd_t *bd, char *commandline)
 {
 	char *p;
@@ -235,7 +246,7 @@ static void boot_prep_linux(bootm_headers_t *images)
 			hang();
 		}
 #endif
-	} else if (BOOTM_ENABLE_TAGS) {
+	} else if (BOOTM_ENABLE_TAGS) {	
 		debug("using: ATAGS\n");
 		setup_start_tag(gd->bd);
 		if (BOOTM_ENABLE_SERIAL_TAG)
@@ -246,6 +257,8 @@ static void boot_prep_linux(bootm_headers_t *images)
 			setup_revision_tag(&params);
 		if (BOOTM_ENABLE_MEMORY_TAGS)
 			setup_memory_tags(gd->bd);
+        if (BOOTM_ENABLE_DMAMEM_TAG)
+            setup_dmamem_tag(gd->bd);
 		if (BOOTM_ENABLE_INITRD_TAG) {
 			/*
 			 * In boot_ramdisk_high(), it may relocate ramdisk to
@@ -359,12 +372,13 @@ static void boot_jump_linux(bootm_headers_t *images, int flag)
 #endif
 	}
 #else
+    /*armv7m will go here comment by <iysheng@163.com>*/
 	unsigned long machid = gd->bd->bi_arch_number;
 	char *s;
 	void (*kernel_entry)(int zero, int arch, uint params);
 	unsigned long r2;
 	int fake = (flag & BOOTM_STATE_OS_FAKE_GO);
-
+    //images entry point comment by <iysheng@163.com>
 	kernel_entry = (void (*)(int, int, uint))images->ep;
 #ifdef CONFIG_CPU_V7M
 	ulong addr = (ulong)kernel_entry | 1;
