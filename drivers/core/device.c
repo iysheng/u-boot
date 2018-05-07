@@ -100,7 +100,6 @@ static int device_bind_common(struct udevice *parent, const struct driver *drv,
 			dev->flags |= DM_FLAG_ALLOC_PDATA;
 			dev->platdata = calloc(1,
 					       drv->platdata_auto_alloc_size);
-        printf("iysheng %s %s*********%s\n", __func__, dev->name,dev->driver->name);
 			if (!dev->platdata) {
 				ret = -ENOMEM;
 				goto fail_alloc1;

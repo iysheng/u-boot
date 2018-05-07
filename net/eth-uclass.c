@@ -279,6 +279,7 @@ int eth_init(void)
 						current->uclass_priv;
 
 					priv->state = ETH_STATE_ACTIVE;
+                    //after success active the eth then return comment by <iysheng@163.com>
 					return 0;
 				}
 			} else {

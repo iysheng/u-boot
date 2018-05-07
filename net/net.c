@@ -1003,7 +1003,7 @@ static void receive_icmp(struct ip_udp_hdr *ip, int len,
 			struct in_addr src_ip, struct ethernet_hdr *et)
 {
 	struct icmp_hdr *icmph = (struct icmp_hdr *)&ip->udp_src;
-
+    //printf("iysheng %s\n", __func__);
 	switch (icmph->type) {
 	case ICMP_REDIRECT:
 		if (icmph->code != ICMP_REDIR_HOST)
@@ -1126,7 +1126,7 @@ void net_process_received_packet(uchar *in_packet, int len)
 		if (vlanid != (myvlanid & VLAN_IDMASK))
 			return;
 	}
-
+    //printf("iysheng %s %08x\n", __func__, eth_proto);
 	switch (eth_proto) {
 	case PROT_ARP:
 		arp_receive(et, ip, len);

@@ -650,8 +650,6 @@ static struct phy_device *phy_device_create(struct mii_dev *bus, int addr,
 	dev->addr = addr;
 	dev->phy_id = phy_id;
 	dev->bus = bus;
-    printf("iysheng %s %08x***************************\n",
-        __func__, phy_id);
 	dev->drv = get_phy_driver(dev, interface);
 
 	phy_probe(dev);
@@ -672,32 +670,13 @@ static struct phy_device *phy_device_create(struct mii_dev *bus, int addr,
  */
 int __weak get_phy_id(struct mii_dev *bus, int addr, int devad, u32 *phy_id)
 {
-	int phy_reg;
-
-
-    #ifdef YYFISH_BOARD
-    phy_reg = bus->read(bus, addr, devad, MII_BMCR);
-    printf("iysheng %s -------aaaa-----%08x\n", __func__, phy_reg);
-	if (phy_reg < 0)
-		return -EIO;
-
-	*phy_id = (phy_reg & 0xffff) << 16;
-
-	/* Grab the bits from PHYIR2, and put them in the lower half */
-	phy_reg = bus->read(bus, addr, devad, MII_BMSR);
-    printf("iysheng %s -------bbbb-----%08x\n", __func__, phy_reg);
-
-	if (phy_reg < 0)
-		return -EIO;
-    #endif
-    
+	int phy_reg; 
 
 	/*
 	 * Grab the bits from PHYIR1, and put them
 	 * in the upper half
 	 */
 	phy_reg = bus->read(bus, addr, devad, MII_PHYSID1);
-    printf("iysheng %s -------111-----%08x\n", __func__, phy_reg);
 	if (phy_reg < 0)
 		return -EIO;
 
@@ -705,14 +684,11 @@ int __weak get_phy_id(struct mii_dev *bus, int addr, int devad, u32 *phy_id)
 
 	/* Grab the bits from PHYIR2, and put them in the lower half */
 	phy_reg = bus->read(bus, addr, devad, MII_PHYSID2);
-    printf("iysheng %s -------222-----%08x\n", __func__, phy_reg);
 
 	if (phy_reg < 0)
 		return -EIO;
 
-	*phy_id |= (phy_reg & 0xffff);
-    printf("iysheng %s -------over-----%08x\n", __func__, phy_reg);
-    
+	*phy_id |= (phy_reg & 0xffff);    
 
 	return 0;
 }
@@ -727,11 +703,6 @@ static struct phy_device *create_phy_by_mask(struct mii_dev *bus,
 		int addr = ffs(phy_mask) - 1;
 		int r = get_phy_id(bus, addr, devad, &phy_id);
 		/* If the PHY ID is mostly f's, we didn't find anything */
-        /*
-         * maybe i come here to create a new struct phy_device device
-         * comment by <iysheng@163.com>
-         */
-        printf("iysheng %s phy_id=%08x \n", __func__, phy_id);
 		if (r == 0 && (phy_id & 0x1fffffff) != 0x1fffffff)
 			return phy_device_create(bus, addr, phy_id, interface);        
 		phy_mask &= ~(1 << addr);

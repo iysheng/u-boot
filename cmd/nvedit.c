@@ -292,8 +292,9 @@ int env_set(const char *varname, const char *varvalue)
 
 	if (varvalue == NULL || varvalue[0] == '\0')
 		return _do_env_set(0, 2, (char * const *)argv, H_PROGRAMMATIC);
-	else
+	else {
 		return _do_env_set(0, 3, (char * const *)argv, H_PROGRAMMATIC);
+    }
 }
 
 /**

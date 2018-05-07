@@ -77,6 +77,7 @@ void arp_raw_request(struct in_addr source_ip, const uchar *target_ethaddr,
 	net_write_ip(&arp->ar_tpa, target_ip);		/* target IP addr */
 
 	net_send_packet(arp_tx_packet, eth_hdr_size + ARP_HDR_SIZE);
+    //printf("iysheng %s\n", __func__);
 }
 
 void arp_request(void)
@@ -218,8 +219,8 @@ void arp_receive(struct ethernet_hdr *et, struct ip_udp_hdr *ip, int len)
 			   and transmit it */
 			memcpy(((struct ethernet_hdr *)net_tx_packet)->et_dest,
 			       &arp->ar_sha, ARP_HLEN);
+            //printf("iysheng %s\n", __func__);
 			net_send_packet(net_tx_packet, arp_wait_tx_packet_size);
-
 			/* no arp request pending now */
 			net_arp_wait_packet_ip.s_addr = 0;
 			arp_wait_tx_packet_size = 0;

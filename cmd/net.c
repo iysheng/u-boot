@@ -260,7 +260,7 @@ static int do_ping(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	if (argc < 2)
 		return CMD_RET_USAGE;
 
-	net_ping_ip = string_to_ip(argv[1]);
+	net_ping_ip = string_to_ip(argv[1]);//get ping ip addr
 	if (net_ping_ip.s_addr == 0)
 		return CMD_RET_USAGE;
 

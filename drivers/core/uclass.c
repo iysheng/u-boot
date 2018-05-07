@@ -238,7 +238,6 @@ int uclass_find_device_by_name(enum uclass_id id, const char *name,
 	if (ret)
 		return ret;
 	list_for_each_entry(dev, &uc->dev_head, uclass_node) {
-	    printf("iysheng %s %s\n", __func__, dev->name);
 		if (!strncmp(dev->name, name, strlen(name))) {
 			*devp = dev;
 			return 0;

@@ -147,7 +147,7 @@ static void setup_dmamem_tag(bd_t *bd)
 {
     params->hdr.tag = ATAG_DMAMEM;
 	params->hdr.size = tag_size (tag_dmamem);
-	params->u.dmamem.base = bd->bi_dram[0].start + bd->bi_dram[0].size / 2;
+	params->u.dmamem.base = bd->bi_dram[0].start + bd->bi_dram[0].size / 2;//iysheng
 	params->u.dmamem.sz_all = 0x100000;
     params->u.dmamem.sz_fb = 0x1000;
 	params = tag_next (params);
